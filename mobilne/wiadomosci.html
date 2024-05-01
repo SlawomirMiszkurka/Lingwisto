@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiadomości</title>
+</head>
+<body>
+    <div id="app" class="container">
+        <h2>Wiadomości</h2>
+        <div id="friends-list">
+            <div v-for="(friend, friendId) in friends" :key="friendId" class="friend">
+                <p>{{ friend.name }}</p>
+                <button @click="openChat(friendId, friend.name)">Otwórz czat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dodaj tutaj skrypty Vue.js i Firebase -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
+    <script>
+        // Konfiguracja Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaGP-ADlaVgOGXoyoePebFimn7Xy7MsWw",
+            authDomain: "project-af0f5.firebaseapp.com",
+            databaseURL: "https://project-af0f5-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "project-af0f5",
+            storageBucket: "project-af0f5.appspot.com",
+            messagingSenderId: "82817780469",
+            appId: "1:82817780469:web:45c3cb6de62a9f279753bc"
+        };
+
+        // Inicjalizacja Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = app.database();
+
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    friends: {}
+                };
+            },
+            created() {
+                const userId = "id_uzytkownika"; // Zastąp "id_uzytkownika" rzeczywistym identyfikatorem użytkownika
+                const userFriendsRef = database.ref(`users/${userId}/friends`);
+                userFriendsRef.once("value", snapshot => {
+                    this.friends = snapshot.val() || {};
+                });
+            },
+            methods: {
+                openChat(friendId, friendName) {
+                    // Przekieruj użytkownika do strony czatu z odpowiednimi parametrami
+                    window.location.href = `czat.html?friendId=${friendId}&friendName=${friendName}`;
+                    // Wywołaj funkcję wibracji
+                    this.vibrateNotification();
+                },
+                vibrateNotification() {
+                    if ("vibrate" in navigator) {
+                        navigator.vibrate([200, 100, 200]); // Przykładowy wzorzec wibracji: wibracja, pauza, wibracja
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

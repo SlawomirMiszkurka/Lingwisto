@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rejestracja</title>
+    <!-- Dodaj tutaj linki do CSS, jeśli są wymagane -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select,
+        textarea,
+        button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 300px;
+            max-width: 100%;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .error-msg {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container">
+        <h2>Rejestracja</h2>
+        <form @submit.prevent="submitRegistrationForm">
+            <input type="text" v-model="username" placeholder="Login" required><br>
+            <input type="password" v-model="password" placeholder="Hasło" required><br>
+            <input type="text" v-model="nickname" placeholder="Nick" required>
+            <span id="nickname-error" class="error-msg"></span><br>
+            <select v-model="country">
+                <option value="" selected disabled hidden>Kraj pochodzenia</option>
+                <option value="Polska">Polska</option>
+                <option value="USA">USA</option>
+              
+            </select><br>
+            <select v-model="contactCountry">
+                <option value="" selected disabled hidden>Kraj kontaktowy</option>
+                <option value="Polska">Polska</option>
+                <option value="USA">USA</option>
+               
+            </select><br>
+            <select v-model="language">
+                <option value="" selected disabled hidden>Język</option>
+                <option value="angielski">Angielski</option>
+                <option value="hiszpański">Hiszpański</option>
+                
+            </select><br>
+            <input type="date" v-model="birthdate" required><br>
+            <select v-model="interests">
+                <option value="" selected disabled hidden>Zainteresowania</option>
+                <option value="sport">Sport</option>
+                <option value="muzyka">Muzyka</option>
+             
+            </select><br>
+            <textarea v-model="moreInfo" placeholder="Więcej informacji"></textarea><br>
+            <button type="submit">Zarejestruj</button>
+
+        </form>
+    </div>
+
+    <!-- Dodaj tutaj skrypty Vue.js i Firebase -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        
+        // Konfiguracja Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaGP-ADlaVgOGXoyoePebFimn7Xy7MsWw",
+            authDomain: "project-af0f5.firebaseapp.com",
+            databaseURL: "https://project-af0f5-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "project-af0f5",
+            storageBucket: "project-af0f5.appspot.com",
+            messagingSenderId: "82817780469",
+            appId: "1:82817780469:web:45c3cb6de62a9f279753bc"
+        };
+
+        
+        // Inicjalizacja Firebase
+        const firebaseApp = initializeApp(firebaseConfig);
+        const db = getDatabase(firebaseApp);
+
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    username: '',
+                    password: '',
+                    nickname: '',
+                    country: '',
+                    contactCountry: '',
+                    language: '',
+                    birthdate: '',
+                    interests: '',
+                    moreInfo: ''
+                };
+            },
+            methods: {
+              
+                async submitRegistrationForm() {
+
+                    // Sprawdzenie wieku użytkownika
+                    const age = this.calculateAge(this.birthdate);
+                    if (age < 18) {
+                        alert("Musisz mieć co najmniej 18 lat, aby założyć konto.");
+                        return; // Przerwij rejestrację, jeśli użytkownik jest niepełnoletni
+                    }
+                    // Zapis danych użytkownika do bazy Firebase
+                    this.writeUserData({
+                        username: this.username,
+                        password: this.password,
+                        nickname: this.nickname,
+                        country: this.country,
+                        contactCountry: this.contactCountry,
+                        language: this.language,
+                        birthdate: this.birthdate,
+                        interests: this.interests,
+                        moreInfo: this.moreInfo
+                    });
+                },
+
+                writeUserData(userData) {
+                    const usersRef = ref(db, 'users');
+                    push(usersRef, userData) 
+                    .then(() => {
+                        console.log("Dane użytkownika zostały zapisane w bazie danych Firebase.");
+                        alert("Rejestracja zakończona pomyślnie!");
+                        window.location.href = "login.html"; // Przekierowanie do strony login.html
+                    })
+                    .catch((error) => {
+                        console.error("Błąd zapisu danych użytkownika:", error);
+                        alert("Wystąpił błąd podczas zapisu danych użytkownika.");
+                    });
+                    },
+                    calculateAge(birthDate) {
+                        const today = new Date();
+                        const birth = new Date(birthDate);
+                        let age = today.getFullYear() - birth.getFullYear();
+                        const monthDiff = today.getMonth() - birth.getMonth();
+                        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                            age--;
+                        }
+                        return age;
+                    }
+                }
+
+        });
+        
+    </script>
+</body>
+</html>
