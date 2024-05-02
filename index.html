@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wybór akcji</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+      }
+
+      .container {
+        text-align: center;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        margin: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: #fff;
+        width: auto;
+      }
+
+      .btn:hover {
+        background-color: #0056b3;
+      }
+
+      .loading {
+        display: none;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="container">
+      <h1>Wybierz akcję</h1>
+      <button class="btn" @click="redirectTo('login')">Logowanie</button>
+      <button class="btn" @click="redirectTo('registration')">Rejestracja</button>
+      <button class="btn" @click="handleGoogle()">Kontynuuj z Google</button>
+      <button class="btn" @click="handleFacebook()">
+        Kontynuuj z Facebook
+ </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyCaGP-ADlaVgOGXoyoePebFimn7Xy7MsWw",
+        authDomain: "project-af0f5.firebaseapp.com",
+        databaseURL:
+          "https://project-af0f5-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "project-af0f5",
+        storageBucket: "project-af0f5.appspot.com",
+        messagingSenderId: "82817780469",
+        appId: "1:82817780469:web:45c3cb6de62a9f279753bc",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+
+      new Vue({
+        el: "#app",
+        methods: {
+          redirectTo(page) {
+                    window.location.href = `${page}.html`;
+                },
+          async handleGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+              const result = await firebase.auth().signInWithPopup(provider);
+              const user = result.user;
+              alert("Zalogowano pomyślnie jako: " + user.displayName);
+              window.location.href = "complete_your_profile.html";
+            } catch (error) {
+              const errorMessage = error.message;
+              console.error("Błąd logowania:", errorMessage);
+            }
+          },
+          async handleFacebook() {
+            const provider = new firebase.auth.FacebookAuthProvider();
+            try {
+              const result = await firebase.auth().signInWithPopup(provider);
+              const user = result.user;
+              alert("Zalogowano pomyślnie jako: " + user.displayName);
+              window.location.href = "complete_your_profile.html";
+            } catch (error) {
+              const errorMessage = error.message;
+              console.error("Błąd logowania:", errorMessage);
+            }
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

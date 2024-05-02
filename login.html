@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logowanie</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 300px;
+            max-width: 100%;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Logowanie</h1>
+        <div v-if="!isLoggedIn">
+            <input type="text" v-model="loginData.username" placeholder="Login"><br>
+            <input type="password" v-model="loginData.password" placeholder="Hasło"><br>
+            <button @click="login">Zaloguj</button>
+            <p v-if="loginError" style="color: red;">{{ loginError }}</p>
+        </div>
+        <div v-else>
+            <p>Logowanie pomyślne. Przekierowywanie do strony głównej...</p>
+        </div>
+    </div>
+
+    <script>
+    
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaGP-ADlaVgOGXoyoePebFimn7Xy7MsWw",
+            authDomain: "project-af0f5.firebaseapp.com",
+            databaseURL: "https://project-af0f5-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "project-af0f5",
+            storageBucket: "project-af0f5.appspot.com",
+            messagingSenderId: "82817780469",
+            appId: "1:82817780469:web:45c3cb6de62a9f279753bc"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    loginData: {
+                        username: '',
+                        password: ''
+                    },
+                    loggedInUser: null,
+                    isLoggedIn: false,
+                    loginError: ''
+                };
+            },
+            methods: {
+                login() {
+                    const { username, password } = this.loginData;
+                    const db = firebase.database();
+                    const usersRef = db.ref('users');
+
+                    usersRef.once('value', (snapshot) => {
+                        const usersData = snapshot.val();
+                        if (usersData) {
+                            const user = Object.values(usersData).find(u => u.username === username);
+                            if (user) {
+                                if (user.password === password) {
+                                    this.isLoggedIn = true;
+                                    this.loggedInUser = user;
+                                    window.location.href = 'main.html';
+                                } else {
+                                    this.loginError = 'Błędny login lub hasło';
+                                }
+                            } else {
+                                this.loginError = 'Błędny login lub hasło';
+                            }
+                        } else {
+                            this.loginError = 'Baza danych użytkowników jest pusta';
+                        }
+                    });
+                },
+                
+            }
+        });
+    </script>
+</body>
+</html>
