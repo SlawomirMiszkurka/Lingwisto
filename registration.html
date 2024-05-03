@@ -71,10 +71,9 @@
                 <option v-for="(language, index) in selectedContactCountryLanguages" :key="index" :value="language">{{ language }}</option>
             </select><br>
             <input type="date" v-model="birthdate" required><br>
-            <select v-model="interests">
+            <select v-model="hobbies">
                 <option value="" selected disabled hidden>Zainteresowania</option>
-                <option value="sport">Sport</option>
-                <option value="muzyka">Muzyka</option>
+                <option v-for="(hobbies, index) in hobbies" :key="index" :value="hobbies">{{ hobbies }}</option>
             </select><br>
             <textarea v-model="moreInfo" placeholder="Więcej informacji"></textarea><br>
             <button type="submit">Zarejestruj</button>
@@ -113,7 +112,7 @@
                     contactCountry: '',
                     language: '',
                     birthdate: '',
-                    interests: '',
+                    hobbies: '',
                     moreInfo: '',
                     countries: [],
                     selectedContactCountryLanguages: []
@@ -135,7 +134,7 @@
                         contactCountry: this.contactCountry,
                         language: this.language,
                         birthdate: this.birthdate,
-                        interests: this.interests,
+                        hobbies: this.hobbies,
                         moreInfo: this.moreInfo
                     });
                 },
